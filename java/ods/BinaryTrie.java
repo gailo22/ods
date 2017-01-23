@@ -5,15 +5,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Random;
 
-public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSet<T> {
+public class BinaryTrie<Node extends BinaryTrie.Node<Node,T>, T> implements SSet<T> {
 	
-	public static class Nöde<Node extends Nöde<Node, T>, T>  {
+	public static class Node<N extends Node<N, T>, T>  {
 		T x;
 		Node parent;
 		Node[] child;
 		Node jump;
 		@SuppressWarnings("unchecked")
-		Nöde() {
+		Node() {
 			child = (Node[])Array.newInstance(getClass(), 2);
 		}
 		public String toString() {
@@ -86,7 +86,7 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 	
 	public boolean add(T x) {
 		int i, c = 0, ix = it.intValue(x);
-		Node u = r;
+		Node<?, T> u = r;
 		// 1 - search for ix until falling out of the trie
 		for (i = 0; i < w; i++) {
 			c = (ix >>> w-i-1) & 1;
@@ -99,7 +99,7 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 		// 2 - add path to ix
 		for (; i < w; i++) {
 			c = (ix >>> w-i-1) & 1;
-			u.child[c] = newNode();
+			u.child[c] = (Node) newNode();
 			u.child[c].parent = u;
 			u = u.child[c];
 		}
@@ -110,12 +110,12 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 		u.child[prev].child[next] = u;
 		u.child[next].child[prev] = u;
 		// 4 - walk back up, updating jump pointers
-		Node v = u.parent;
+		Node<?, T> v = u.parent;
 		while (v != null) {
 			if ((v.child[left] == null 
-					&& (v.jump == null || it.intValue(v.jump.x) > ix))
+					&& (v.jump == null || it.intValue((T) v.jump.x) > ix))
 			|| (v.child[right] == null 
-					&& (v.jump == null || it.intValue(v.jump.x) < ix)))
+					&& (v.jump == null || it.intValue((T) v.jump.x) < ix)))
 				v.jump = u;
 			v = v.parent;
 		}
@@ -148,10 +148,10 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 	}
 
 	protected void checkList() {
-		Node u = dummy.child[right];
+		Node<?, T> u = dummy.child[right];
 		do {
 			if (u.child[right] != dummy) 
-				Utils.myassert(it.intValue(u.x) < it.intValue(u.child[right].x));
+				Utils.myassert(it.intValue(u.x) < it.intValue((T)u.child[right].x));
 			Utils.myassert(u.child[left].child[right] == u);
 			Utils.myassert(u.child[right].child[left] == u);
 			u = u.child[right];
@@ -160,7 +160,7 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 
 	public T find(T x) {
 		int i, c = 0, ix = it.intValue(x);
-		Node u = r;
+		Node<?, T> u = r;
 		for (i = 0; i < w; i++) {
 			c = (ix >>> w-i-1) & 1;
 			if (u.child[c] == null) break;
@@ -244,8 +244,8 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 	}
 	
 	public T findLT(T x) {
-		Node pred = findPredNode(x);
-		return (pred == dummy) ? null : pred.child[next].x;
+		Node<?, T> pred = findPredNode(x);
+		return (pred == dummy) ? null : (T) pred.child[next].x;
 	}
 
 	/**
@@ -265,7 +265,7 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 		}
 
 		public T next() {
-			T x = p.x;
+			T x = (T) p.x;
 			p = p.child[1];
 			return x;
 		}
@@ -295,7 +295,7 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 		dummy.child[0] = dummy.child[1] = dummy;
 	}
 	
-	public static <N extends BinaryTrie.Nöde<N,Integer> > 
+	public static <N extends BinaryTrie.Node<N,Integer> > 
 	void easyTests(BinaryTrie<N,Integer> t, int n) {
 		System.out.println(t.getClass());
 		Random rand = new Random(0);
@@ -339,7 +339,7 @@ public class BinaryTrie<Node extends BinaryTrie.Nöde<Node,T>, T> implements SSe
 	
 	public static void main(String[] args) {
 		int n = 20;
-		class N<T> extends Nöde<N<T>, T> {};
+		class N<T> extends Node<N<T>, T> {};
 		N<Integer> node = new N<Integer>();
 		class I implements Integerizer<Integer> { 
 			public int intValue(Integer i) { return i; } 

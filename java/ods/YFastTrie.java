@@ -68,7 +68,7 @@ public class YFastTrie<T> implements SSet<T> {
 			return Utils.collectionToString(this);
 		}
 	}
-	protected static class Node<T> extends XFastTrie.Nöde<Node<T>,Pair<T>> {};
+	protected static class Node<T> extends XFastTrie.Node<Node<T>,Pair<T>> {};
 	protected static final int w = XFastTrie.w;
 	protected XFastTrie<Node<T>,Pair<T>> xft;
 	protected Integerizer<T> it;
@@ -125,12 +125,13 @@ public class YFastTrie<T> implements SSet<T> {
 	}
 
 	public T findLT(T x) {
-		int ix = it.intValue(x);
-		Node<T> u = xft.findNode(ix);
-		T y = u.x.t.findLT(x);
-		if (y == null && u.child[0] != xft.dummy)
-			y = u.child[0].x.t.findLT(x);
-		return y;
+//		int ix = it.intValue(x);
+//		Node<T> u = (Node<T>) xft.findNode(ix);
+//		T y = u.x.t.findLT(x);
+//		if (y == null && u.child[0] != xft.dummy)
+//			y = u.child[0].x.t.findLT(x);
+//		return y;
+		return null;
 	}
 
 	public Iterator<T> iterator(T x) {
@@ -140,16 +141,17 @@ public class YFastTrie<T> implements SSet<T> {
 	}
 
 	public boolean remove(T x) {
-		int ix = it.intValue(x);
-		Node<T> u = xft.findNode(ix);
-		boolean ret = u.x.t.remove(x);
-		if (ret) n--;
-		if (u.x.x == ix && ix != 0xffffffff) {
-			STreap<T> t2 = u.child[1].x.t;
-			t2.absorb(u.x.t);
-			xft.remove(u.x);
-		}
-		return ret;
+//		int ix = it.intValue(x);
+//		Node<T> u = (Node<T>) xft.findNode(ix);
+//		boolean ret = u.x.t.remove(x);
+//		if (ret) n--;
+//		if (u.x.x == ix && ix != 0xffffffff) {
+//			STreap<T> t2 = u.child[1].x.t;
+//			t2.absorb(u.x.t);
+//			xft.remove(u.x);
+//		}
+//		return ret;
+		return false;
 	}
 
 	@Override
